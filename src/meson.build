@@ -57,6 +57,7 @@ srcs += files(
   'dtrafo.f90',
   'dynamic.f90',
   'eeq_model.f90',
+  'efei.f90',
   'elem.f90',
   'embedding.f90',
   'enso_printout.f90',

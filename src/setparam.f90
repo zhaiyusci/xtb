@@ -382,6 +382,14 @@ module xtb_setparam
    real(wp) :: stm_pot    =0.0_wp
    real(wp) :: stm_thr    =1.0_wp
 
+!! ------------------------------------------------------------------------
+!  EFEI stuff
+!! ------------------------------------------------------------------------
+   logical  :: pr_efei    = .false.
+   integer  :: efei_atom1 = 1
+   integer  :: efei_atom2 = 2
+   real(wp) :: efei_force = 0.0_wp
+
 !  exchange correction scaling factor for HS case 0.3, for LS case -1.4
    real(wp) :: ex_open ! set to 0.5/-0.5 in .xtbrc, respectively
 

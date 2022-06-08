@@ -54,6 +54,7 @@ module xtb_type_data
       real(wp) :: e_hb = 0.0_wp
       real(wp) :: e_batm = 0.0_wp
       real(wp) :: e_ext = 0.0_wp
+      real(wp) :: e_efei = 0.0_wp ! yuzhai
    end type scc_results
 
    type freq_results

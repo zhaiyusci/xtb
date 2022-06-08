@@ -142,6 +142,7 @@ subroutine write_set(ictrl)
    call write_set_write(ictrl)
    call write_set_external(ictrl)
    call write_set_stm(ictrl)
+   call write_set_efei(ictrl)
    call write_set_path(ictrl)
    call write_set_split(ictrl)
    call write_set_wall(ictrl)
@@ -392,6 +393,7 @@ subroutine write_set_write(ictrl)
    write(ictrl,'(3x,"gbsa=",a)')             bool2string(set%pr_gbsa)
    write(ictrl,'(3x,"vib_normal_modes=",a)') bool2string(set%pr_nmtm)
    write(ictrl,'(3x,"hessian.out=",a)')      bool2string(set%pr_dftbp_hessian_out)
+   write(ictrl,'(3x,"efei=",a)')             bool2string(set%pr_efei)
 end subroutine write_set_write
 
 subroutine write_set_external(ictrl)
@@ -425,6 +427,16 @@ subroutine write_set_stm(ictrl)
    write(ictrl,'(3x,"thr=",g0)')                    set%stm_thr
    write(ictrl,'(3x,"potential=",g0,1x,"#",1x,a)')  set%stm_pot,"in V"
 end subroutine write_set_stm
+
+subroutine write_set_efei(ictrl)
+   implicit none
+   integer,intent(in) :: ictrl
+   if (set%efei_force.eq.0.0_wp) return
+   write(ictrl,'(a,"efei")') flag
+   write(ictrl,'(3x,"atom1= ",i5)') set%efei_atom1
+   write(ictrl,'(3x,"atom2= ",i5)') set%efei_atom2
+   write(ictrl,'(3x,"force= ",f10.3,a)') set%efei_force, " in nN"
+end subroutine write_set_efei
 
 subroutine write_set_path(ictrl)
    use xtb_type_atomlist
@@ -786,6 +798,7 @@ subroutine rdcontrol(fname,env,copy_file)
          case('path'     ); call rdblock(env,set_path,    line,id,copy,err,ncount)
          case('reactor'  ); call rdblock(env,set_reactor, line,id,copy,err,ncount)
          case('stm'      ); call rdblock(env,set_stm,     line,id,copy,err,ncount)
+         case('efei'     ); call rdblock(env,set_efei,    line,id,copy,err,ncount)
          ! data + user data which is read later, but we start counting here
          case('fix'      ); call rdblock(env,set_fix,     line,id,copy,err,ncount)
          case('wall'     ); call rdblock(env,set_wall,    line,id,copy,err,ncount)
@@ -1137,6 +1150,7 @@ subroutine set_write(env,key,val)
    logical,save :: set29 = .true.
    logical,save :: set30 = .true.
    logical,save :: set31 = .true.
+   logical,save :: set32 = .true.
    select case(key)
    case default ! do nothing
       call env%warning("the key '"//key//"' is not recognized by write",source)
@@ -1236,6 +1250,9 @@ subroutine set_write(env,key,val)
    case('hessian.out')
       if (getValue(env,val,ldum).and.set31) set%pr_dftbp_hessian_out = ldum
       set31 = .false.
+   case('efei')
+      if (getValue(env,val,ldum).and.set32) set%pr_efei = ldum
+      set32 = .false.
    end select
 end subroutine set_write
 
@@ -2041,6 +2058,34 @@ subroutine set_stm(env,key,val)
       set5 = .false.
    end select
 end subroutine set_stm
+
+subroutine set_efei(env,key,val)
+   implicit none
+   character(len=*), parameter :: source = 'set_efei'
+   type(TEnvironment), intent(inout) :: env
+   character(len=*),intent(in) :: key
+   character(len=*),intent(in) :: val
+   integer  :: err
+   integer  :: idum
+   real(wp) :: ddum
+   logical  :: ldum
+   logical,save :: set1 = .true.
+   logical,save :: set2 = .true.
+   logical,save :: set3 = .true.
+   select case(key)
+   case default ! do nothing
+      call env%warning("the key '"//key//"' is not recognized by efei",source)
+   case('atom1')
+      if (getValue(env,val,idum).and.set1) set%efei_atom1 = idum
+      set1 = .false.
+   case('atom2')
+      if (getValue(env,val,idum).and.set2) set%efei_atom2 = idum
+      set2 = .false.
+   case('force')
+      if (getValue(env,val,ddum).and.set3) set%efei_force = ddum
+      set3 = .false.
+   end select
+end subroutine set_efei
 
 subroutine set_symmetry(env,key,val)
    implicit none
