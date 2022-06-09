@@ -36,7 +36,7 @@ module xtb_efei
    r =  norm2(r12)
 
    energy = -r*force
-   gradient(:, atom1) = gradient(:, atom1)-r12 * force/r
-   gradient(:, atom2) = gradient(:, atom2)+r12 * force/r
+   gradient(:, atom1) = gradient(:, atom1)+r12 * force/r
+   gradient(:, atom2) = gradient(:, atom2)-r12 * force/r
  end subroutine efeiEnGrad
  end module xtb_efei
