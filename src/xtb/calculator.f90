@@ -48,6 +48,7 @@ module xtb_xtb_calculator
    use xtb_eeq, only : eeq_chrgeq
    use xtb_iniq, only : iniqcn
    use xtb_scc_core, only : iniqshell
+   use xtb_efei, only : efeiEnGrad
    implicit none
 
    private
@@ -235,6 +236,7 @@ subroutine singlepoint(self, env, mol, chk, printlevel, restart, &
    integer :: i,ich
    integer :: mode_sp_run = 1
    real(wp) :: efix
+   real(wp) :: e_efei
    logical :: inmol
    logical, parameter :: ccm = .true.
    logical :: exitRun
@@ -294,11 +296,16 @@ subroutine singlepoint(self, env, mol, chk, printlevel, restart, &
    call cavity_egrad(mol%n,mol%at,mol%xyz,efix,gradient)
    call metadynamic (metaset,mol%n,mol%at,mol%xyz,efix,gradient)
    call metadynamic (rmsdset,mol%n,mol%at,mol%xyz,efix,gradient)
+   ! ------------------------------------------------------------------------
+   ! EFEI
+   call efeiEnGrad (mol, e_efei, gradient)
+   results%e_efei = e_efei
 
    ! ------------------------------------------------------------------------
    !  fixing of certain atoms
    !  print*,abs(efix/etot)
-   energy = energy + efix
+   ! Also include efei contribution
+   energy = energy + efix + e_efei
    results%e_total = energy
    results%gnorm = norm2(gradient)
    if (fixset%n.gt.0) then
@@ -337,7 +344,7 @@ subroutine singlepoint(self, env, mol, chk, printlevel, restart, &
          if (self%xtbData%level.eq.2) call print_gfn2_results(env%unit,results,set%verbose,allocated(self%solvation))
          if (self%xtbData%level.eq.1) call print_gfn1_results(env%unit,results,set%verbose,allocated(self%solvation))
          if (self%xtbData%level.eq.0) call print_gfn0_results(env%unit,results,set%verbose,allocated(self%solvation))
-         write(iunit,outfmt) "EFEI energy       ", res%e_efei, "Eh   "
+         write(iunit,outfmt) "EFEI energy       ", results%e_efei, "Eh   "
          write(env%unit,outfmt) "add. restraining  ", efix,       "Eh   "
          write(env%unit,outfmt) "total charge      ", sum(chk%wfn%q), "e    "
          if (set%verbose) then

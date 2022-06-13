@@ -53,7 +53,6 @@ module xtb_scf
    use xtb_hlex
    use xtb_local
    use xtb_dipole
-   use xtb_efei
    implicit none
    private
 
@@ -181,7 +180,7 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
 
    real(wp) :: dipol(3),dip,gsolv,eat,hlgap,efix
    real(wp) :: xsum,eh1,rab,eold,dum,xx,r2
-   real(wp) :: t0,t1,sum,rr,hav,alpha,ep,dx,dy,dz,dum1,r0i,r0j,eefei
+   real(wp) :: t0,t1,sum,rr,hav,alpha,ep,dx,dy,dz,dum1,r0i,r0j
    real(wp) :: efa,efb,nfoda,nfodb,hdii,hdjj,qconv,ff
    real(wp) :: x1,x2,ed,intcut,neglect,ga,gb,ehb,h0s,hmat,rab2
    real(wp) :: h0sr,scfconv,rmsq,dum2,drfdxyz(3),yy,tex,rav,tab,ljexp
@@ -255,7 +254,6 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
    eat  = 0.0_wp
    egap = 0.0_wp
    molpol = 0.0_wp
-   eefei = 0.0_wp
 
    pr   = prlevel.gt.1
    minpr= prlevel.gt.0
@@ -535,10 +533,6 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
 
    if (profile) call timer%measure(2)
    if (profile) call timer%measure(4,"integral evaluation")
-
-   ! ------------------------------------------------------------------------
-   ! EFEI
-   call efeiEnGrad(mol,eefei,gradient)
 
    ! ========================================================================
    ! Overlap integrals
@@ -870,7 +864,7 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
    ! ========================================================================
    ! SAVE FOR FINAL PRINTOUT
    ! total energy
-   energy = eel + ep + exb + embd + eefei
+   energy = eel + ep + exb + embd
    eat = eatoms*evtoau - energy
    if (.not.allocated(scD4)) then
       energy = energy + ed
@@ -885,7 +879,6 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
    res%e_total = energy
    res%hl_gap  = egap
    res%dipole  = dipol
-   res%e_efei  = eefei ! yuzhai
    if (allocated(xtbData%halogen)) res%e_xb = exb
    if (allocated(solvation)) then
       res%g_solv  = gsolv
