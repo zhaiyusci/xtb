@@ -405,6 +405,7 @@ subroutine print_gfn2_results(iunit,res,verbose,lsolv)
    write(iunit,outfmt) "   -> Gshift      ", res%g_shift,"Eh   "
    endif
    write(iunit,outfmt) "repulsion energy  ", res%e_rep,  "Eh   "
+   write(iunit,outfmt) "EFEI energy       ", res%e_efei, "Eh   "
 end subroutine print_gfn2_results
 
 
