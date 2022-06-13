@@ -344,7 +344,7 @@ subroutine singlepoint(self, env, mol, chk, printlevel, restart, &
          if (self%xtbData%level.eq.2) call print_gfn2_results(env%unit,results,set%verbose,allocated(self%solvation))
          if (self%xtbData%level.eq.1) call print_gfn1_results(env%unit,results,set%verbose,allocated(self%solvation))
          if (self%xtbData%level.eq.0) call print_gfn0_results(env%unit,results,set%verbose,allocated(self%solvation))
-         write(iunit,outfmt) "EFEI energy       ", results%e_efei, "Eh   "
+         write(env%unit,outfmt) "EFEI energy       ", results%e_efei, "Eh   "
          write(env%unit,outfmt) "add. restraining  ", efix,       "Eh   "
          write(env%unit,outfmt) "total charge      ", sum(chk%wfn%q), "e    "
          if (set%verbose) then
